@@ -1,0 +1,182 @@
+// Prisma Schema for ZS-Studios Real Estate Platform
+// Datasource: PostgreSQL
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  BUYER
+  AGENT
+  ADMIN
+}
+
+enum ListingType {
+  FOR_SALE
+  FOR_RENT
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  CONDO
+  VILLA
+  PENTHOUSE
+  COMMERCIAL
+}
+
+enum PropertyStatus {
+  ACTIVE
+  PENDING
+  SOLD
+  DRAFT
+}
+
+enum InquiryType {
+  SCHEDULE_VIEWING
+  REQUEST_INFO
+  MAKE_OFFER
+  GENERAL_QUESTION
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  TOUR_SCHEDULED
+  UNDER_REVIEW
+  CLOSED
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  name          String
+  role          Role            @default(BUYER)
+  avatar        String?
+  phone         String?
+  licenseNumber String?
+  agency        String?
+  bio           String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  listings      Property[]      @relation("AgentListings")
+  inquiries     Inquiry[]       @relation("UserInquiries")
+  savedItems    SavedProperty[]
+  savedSearches SavedSearch[]
+}
+
+model Property {
+  id                 String          @id @default(uuid())
+  title              String
+  slug               String          @unique
+  description        String
+  price              Float
+  listingType        ListingType     @default(FOR_SALE)
+  propertyType       PropertyType    @default(HOUSE)
+  status             PropertyStatus  @default(ACTIVE)
+  
+  beds               Int
+  baths              Float
+  sqft               Int
+  lotSizeSqft        Int?
+  yearBuilt          Int
+  
+  address            String
+  city               String
+  state              String
+  zipCode            String
+  country            String          @default("USA")
+  neighborhood       String?
+  latitude           Float
+  longitude          Float
+  
+  pricePerSqft       Float?
+  hoaFeeMonthly      Float?          @default(0)
+  propertyTaxYearly  Float?          @default(0)
+  insuranceYearly    Float?          @default(0)
+  
+  images             String[]
+  floorPlanUrl       String?
+  virtualTourUrl     String?
+  amenities          String[]
+  featured           Boolean         @default(false)
+  viewsCount         Int             @default(0)
+  
+  agentId            String
+  agent              User            @relation("AgentListings", fields: [agentId], references: [id])
+  
+  priceHistory       PriceHistory[]
+  inquiries          Inquiry[]
+  savedByUsers       SavedProperty[]
+
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@index([city, status, price])
+  @@index([listingType, propertyType])
+}
+
+model PriceHistory {
+  id         String   @id @default(uuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  price      Float
+  event      String   // LISTED, PRICE_DROP, PRICE_INCREASE, PENDING, SOLD
+  date       DateTime @default(now())
+}
+
+model Inquiry {
+  id            String       @id @default(uuid())
+  propertyId    String
+  property      Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?        @relation("UserInquiries", fields: [userId], references: [id])
+  
+  name          String
+  email         String
+  phone         String
+  message       String
+  preferredDate DateTime?
+  preferredTime String?
+  type          InquiryType  @default(SCHEDULE_VIEWING)
+  status        LeadStatus   @default(NEW)
+  notes         String?
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([propertyId, status])
+}
+
+model SavedProperty {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId])
+}
+
+model SavedSearch {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  location     String?
+  listingType  String?
+  minPrice     Float?
+  maxPrice     Float?
+  propertyType String?
+  beds         Int?
+  baths        Float?
+  notifyEmail  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}

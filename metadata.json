@@ -1,0 +1,8 @@
+{
+  "name": "ZS-Studios - Real Estate Sales & Listing Platform",
+  "description": "ZS-Studios Real Estate - Production-ready real estate marketplace featuring curated property listings, interactive mortgage estimator, agent CRM, and tour scheduling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

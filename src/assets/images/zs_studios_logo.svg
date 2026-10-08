@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <!-- Deep Obsidian Black Background -->
+  <rect width="500" height="500" fill="#000000" rx="40" />
+  
+  <!-- Subtle border definition -->
+  <rect width="496" height="496" x="2" y="2" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="2" rx="38" />
+
+  <!-- ZS-Studios Serif Typography -->
+  <text 
+    x="50%" 
+    y="54%" 
+    dominant-baseline="middle" 
+    text-anchor="middle" 
+    fill="#FFFFFF" 
+    font-family="'Playfair Display', 'Cormorant Garamond', Georgia, serif" 
+    font-size="70" 
+    font-weight="600" 
+    letter-spacing="-0.5px"
+  >
+    ZS-Studios
+  </text>
+</svg>
