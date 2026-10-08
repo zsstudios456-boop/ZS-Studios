@@ -1,0 +1,47 @@
+# Render Blueprint Specification for ZS-Studios Real Estate Platform
+# Documentation: https://render.com/docs/blueprint-spec
+
+services:
+  # 1. Frontend Web Service (Static Site with Vite & Client-Side Routing)
+  - type: web
+    name: zs-studios-real-estate
+    runtime: static
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
+
+    # Environment Variables
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: VITE_APP_NAME
+        value: ZS-Studios Real Estate
+
+    # HTTP Headers for Performance & Security
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+
+    # SPA Routing (Redirect all paths to index.html for client-side navigation)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  # 2. Managed PostgreSQL Database for Prisma ORM Backend Integration
+  - name: zs-studios-db
+    databaseName: zs_studios_real_estate
+    user: zs_admin
+    plan: free
+    region: oregon
+    ipAllowList: [] # Allows connections from all Render services and external clients
